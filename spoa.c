@@ -1382,7 +1382,7 @@ process_frame_cb(evutil_socket_t fd, short events, void *arg)
 		*p++ = SPOE_ACT_T_SET_VAR;                     /* Action type */
 		*p++ = 3;                                      /* Number of args */
 		*p++ = SPOE_SCOPE_TXN;                         /* Arg 1: the scope */
-		spoe_encode_buffer("code", 8, &p, end);        /* Arg 2: variable name */
+		spoe_encode_buffer("code", 4, &p, end);        /* Arg 2: variable name */
 		*p++ = SPOE_DATA_T_UINT32;
 		encode_varint(frame->modsec_code, &p, end); /* Arg 3: variable value */
 		frame->len = (p - frame->buf);
