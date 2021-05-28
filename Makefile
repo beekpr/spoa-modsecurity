@@ -6,19 +6,11 @@ CC ?= gcc
 LD = $(CC)
 
 ifeq ($(MODSEC_INC),)
-MODSEC_INC := modsecurity-2.9.1/INSTALL/include
+MODSEC_INC := ModSecurity-v3.0.4/INSTALL/usr/local/modsecurity/include
 endif
 
 ifeq ($(MODSEC_LIB),)
-MODSEC_LIB := modsecurity-2.9.1/INSTALL/lib
-endif
-
-ifeq ($(APACHE2_INC),)
-APACHE2_INC := /usr/include/apache2
-endif
-
-ifeq ($(APR_INC),)
-APR_INC := /usr/include/apr-1.0
+MODSEC_LIB := ModSecurity-v3.0.4/INSTALL/usr/local/modsecurity/lib
 endif
 
 ifeq ($(LIBXML_INC),)
@@ -33,14 +25,16 @@ ifeq ($(EVENT_INC),)
 EVENT_INC := /usr/include
 endif
 
-CFLAGS  += -g -Wall -pthread
-INCS += -Iinclude -I$(MODSEC_INC) -I$(APACHE2_INC) -I$(APR_INC) -I$(LIBXML_INC) -I$(EVENT_INC)
-LIBS += -lpthread  $(EVENT_LIB) -levent_pthreads -lcurl -lapr-1 -laprutil-1 -lxml2 -lpcre -lyajl
+CFLAGS  += -Wall -Werror -pthread -O3
+# For ASAN, change to clang, replace -O3 with -O0 -g and add -lasan to LIBS
+# -fsanitize=address -fno-omit-frame-pointer
+INCS += -Iinclude -I$(MODSEC_INC) -I$(LIBXML_INC) -I$(EVENT_INC)
+LIBS += -lpthread  $(EVENT_LIB) -levent_pthreads -lcurl -lxml2 -lpcre
 
 OBJS = spoa.o modsec_wrapper.o
 
 modsecurity: $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $^ $(MODSEC_LIB)/standalone.a $(LIBS)
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS) $(MODSEC_LIB)/libmodsecurity.so
 
 install: modsecurity
 	install modsecurity $(DESTDIR)$(BINDIR)
@@ -50,3 +44,5 @@ clean:
 
 %.o:	%.c
 	$(CC) $(CFLAGS) $(INCS) -c -o $@ $<
+
+all: modsecurity
