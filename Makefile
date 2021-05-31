@@ -2,7 +2,7 @@ DESTDIR    =
 PREFIX     = /usr/local
 BINDIR     = $(PREFIX)/bin
 
-CC ?= gcc
+CC ?= clang
 LD = $(CC)
 
 ifeq ($(MODSEC_INC),)
@@ -25,11 +25,11 @@ ifeq ($(EVENT_INC),)
 EVENT_INC := /usr/include
 endif
 
-CFLAGS  += -Wall -Werror -pthread -O3
+CFLAGS  += -Wall -Werror -pthread -O0 -g -fsanitize=address -fno-omit-frame-pointer
 # For ASAN, change to clang, replace -O3 with -O0 -g and add -lasan to LIBS
 # -fsanitize=address -fno-omit-frame-pointer
 INCS += -Iinclude -I$(MODSEC_INC) -I$(LIBXML_INC) -I$(EVENT_INC)
-LIBS += -lpthread  $(EVENT_LIB) -levent_pthreads -lcurl -lxml2 -lpcre
+LIBS += -lasan -lpthread  $(EVENT_LIB) -levent_pthreads -lcurl -lxml2 -lpcre
 
 OBJS = spoa.o modsec_wrapper.o
 
