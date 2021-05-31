@@ -50,7 +50,12 @@ char* terminated(struct sample *data) {
 		retval[data->data.u.str.data] = 0;
 		return retval;
 	} else if (data->data.type == SMP_T_IPV4) {
-		return inet_ntoa(data->data.u.ipv4);
+		char *retval = malloc(INET_ADDRSTRLEN);
+		if (!inet_ntop(AF_INET, &data->data.u.ipv4, retval, INET_ADDRSTRLEN)) {
+			free (retval);
+			return NULL;
+		}
+		return retval;
 	} else if (data->data.type == SMP_T_IPV6) {
 		char *retval = malloc(INET6_ADDRSTRLEN);
 		if (!inet_ntop(AF_INET6, &data->data.u.ipv6, retval, INET6_ADDRSTRLEN)) {
