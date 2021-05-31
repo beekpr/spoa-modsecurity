@@ -134,7 +134,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 	uint64_t qs_len;
 
 	const char *body;
-	uint64_t body_len;
+	//uint64_t body_len;
 	uint64_t body_exposed_len;
 
 	uint64_t name_len;
@@ -236,7 +236,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 
 	/* Decode body. */
 	body = params->body.data.u.str.area;
-	body_len = params->body.data.u.str.data;
+	//body_len = params->body.data.u.str.data;
 
 	if (!msc_append_request_body(transaction, (unsigned char*)body, body_exposed_len)) {
 		errno = EINVAL;
