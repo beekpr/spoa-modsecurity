@@ -238,7 +238,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 	body = params->body.data.u.str.area;
 	body_len = params->body.data.u.str.data;
 
-	if (!msc_append_request_body(transaction, (unsigned char*)body, body_len)) {
+	if (!msc_append_request_body(transaction, (unsigned char*)body, body_exposed_len)) {
 		errno = EINVAL;
 		goto fail;
 	}
