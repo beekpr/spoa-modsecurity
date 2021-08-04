@@ -6,11 +6,11 @@ CC ?= clang
 LD = $(CC)
 
 ifeq ($(MODSEC_INC),)
-MODSEC_INC := ModSecurity-v3.0.4/INSTALL/usr/local/modsecurity/include
+MODSEC_INC := ModSecurity-v3.0.5/INSTALL/usr/local/modsecurity/include
 endif
 
 ifeq ($(MODSEC_LIB),)
-MODSEC_LIB := ModSecurity-v3.0.4/INSTALL/usr/local/modsecurity/lib
+MODSEC_LIB := ModSecurity-v3.0.5/INSTALL/usr/local/modsecurity/lib
 endif
 
 ifeq ($(LIBXML_INC),)

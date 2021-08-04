@@ -1296,7 +1296,7 @@ process_frame_cb(evutil_socket_t fd, short events, void *arg)
 			if (spoe_decode_buffer(&p, end, &str, &sz) == -1)
 				goto stop_processing;
 
-			/* Decode unique id. */
+			/* Decode src ip. */
 			if (spoe_decode_data(&p, end, &params.src_ip) == -1)
 				goto skip_message;
 
@@ -1304,7 +1304,7 @@ process_frame_cb(evutil_socket_t fd, short events, void *arg)
 			if (spoe_decode_buffer(&p, end, &str, &sz) == -1)
 				goto stop_processing;
 
-			/* Decode unique id. */
+			/* Decode src port. */
 			if (spoe_decode_data(&p, end, &params.src_port) == -1)
 				goto skip_message;
 
@@ -1312,7 +1312,7 @@ process_frame_cb(evutil_socket_t fd, short events, void *arg)
 			if (spoe_decode_buffer(&p, end, &str, &sz) == -1)
 				goto stop_processing;
 
-			/* Decode unique id. */
+			/* Decode dest ip. */
 			if (spoe_decode_data(&p, end, &params.dst_ip) == -1)
 				goto skip_message;
 
@@ -1320,7 +1320,7 @@ process_frame_cb(evutil_socket_t fd, short events, void *arg)
 			if (spoe_decode_buffer(&p, end, &str, &sz) == -1)
 				goto stop_processing;
 
-			/* Decode unique id. */
+			/* Decode dest port. */
 			if (spoe_decode_data(&p, end, &params.dst_port) == -1)
 				goto skip_message;
 

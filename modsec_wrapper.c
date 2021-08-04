@@ -22,13 +22,17 @@
 
 #include <modsecurity/modsecurity.h>
 #include <modsecurity/transaction.h>
-#include <modsecurity/rules_set.h>
+#include <modsecurity/rules.h>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "modsec_wrapper.h"
 #include "spoa.h"
 
 static ModSecurity *modsec_server = NULL;
-static RulesSet *rules = NULL;
+static Rules *rules = NULL;
 
 int clamp(struct sample *data, int lower, int upper) {
 	if (data->data.type != SMP_T_SINT)
@@ -161,6 +165,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 
 	const char *hostname = NULL;
 	uint64_t hostname_len = 0;
+	struct in_addr host = {};
 
 	ModSecurityIntervention intervention = {};
 	intervention.status = 200;
@@ -256,6 +261,20 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 		hostname = malloc(sizeof(char) * 8);
 		hostname_len = 7;
 		strncpy((char*)hostname, "unknown", 8);
+	}
+
+	// XXX: AWSHACK
+	// NLBs send an excessive amount of healthchecks that don't even have a host header set, flooding our logs
+	// To prevent this, lets skip those requests here
+	if (strncmp(path, "/healthz", path_len > 8 ? 8 : path_len) == 0) {
+		if (strncmp(hostname, "10.", hostname_len > 3 ? 3 : hostname_len) == 0 &&
+		    strncmp(src_ip_z, "10.", 3) == 0) {
+			// Okay
+			if (inet_aton(src_ip_z, &host) != 0 && ((ntohl(host.s_addr) & 0x000000FF) == 0x00000010)) {
+				fail = 0;
+				goto fail;
+			}
+		}
 	}
 
 	/* Generate parsed_uri */
