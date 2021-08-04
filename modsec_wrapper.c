@@ -22,7 +22,7 @@
 
 #include <modsecurity/modsecurity.h>
 #include <modsecurity/transaction.h>
-#include <modsecurity/rules.h>
+#include <modsecurity/rules_set.h>
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -32,7 +32,7 @@
 #include "spoa.h"
 
 static ModSecurity *modsec_server = NULL;
-static Rules *rules = NULL;
+static RulesSet *rules = NULL;
 
 int clamp(struct sample *data, int lower, int upper) {
 	if (data->data.type != SMP_T_SINT)
