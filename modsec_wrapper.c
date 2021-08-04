@@ -343,7 +343,7 @@ fail:
 	free(src_ip_z);
 	free(dst_ip_z);
 	if (hostname_allocated) {
-		free(hostname);
+		free((void*)hostname);
 	}
 	msc_transaction_cleanup(transaction);
 
