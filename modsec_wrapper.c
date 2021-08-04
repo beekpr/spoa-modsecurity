@@ -247,6 +247,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 	// NLBs send an excessive amount of healthchecks that don't even have a host header set, flooding our logs
 	// To prevent this, lets skip those requests here
 	if (strncmp(path, "/healthz", path_len > 8 ? 8 : path_len) == 0) {
+		printf("%s\n", src_ip_z);
 		if (strncmp(hostname, "10.", hostname_len > 3 ? 3 : hostname_len) == 0 &&
 			strncmp(src_ip_z, "10.", 3) == 0) {
 			// Okay
