@@ -165,6 +165,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 
 	const char *hostname = NULL;
 	uint64_t hostname_len = 0;
+	int hostname_allocated = 0;
 	struct in_addr host = {};
 
 	ModSecurityIntervention intervention = {};
@@ -233,6 +234,30 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 			hostname_len = value_len;
 		}
 	}
+
+	/* Default hostname if we couldn't find the header */
+	if (!hostname) {
+		hostname = malloc(sizeof(char) * 8);
+		hostname_len = 7;
+		strncpy((char*)hostname, "unknown", 8);
+		hostname_allocated = 1;
+	}
+
+	// XXX: AWSHACK
+	// NLBs send an excessive amount of healthchecks that don't even have a host header set, flooding our logs
+	// To prevent this, lets skip those requests here
+	if (strncmp(path, "/healthz", path_len > 8 ? 8 : path_len) == 0) {
+		if (strncmp(hostname, "10.", hostname_len > 3 ? 3 : hostname_len) == 0 &&
+			strncmp(src_ip_z, "10.", 3) == 0) {
+			// Okay
+			if (inet_aton(src_ip_z, &host) != 0 && ((ntohl(host.s_addr) & 0x000000FF) == 0x00000010)) {
+				printf("Matched modsec rule")
+				fail = 0;
+				goto fail;
+			}
+		}
+	}
+
 	if (msc_intervention(transaction, &intervention) > 0) {
 		goto intervention;
 	}
@@ -254,27 +279,6 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 	}
 	if (msc_intervention(transaction, &intervention) > 0) {
 		goto intervention;
-	}
-
-	/* Default hostname if we couldn't find the header */
-	if (!hostname) {
-		hostname = malloc(sizeof(char) * 8);
-		hostname_len = 7;
-		strncpy((char*)hostname, "unknown", 8);
-	}
-
-	// XXX: AWSHACK
-	// NLBs send an excessive amount of healthchecks that don't even have a host header set, flooding our logs
-	// To prevent this, lets skip those requests here
-	if (strncmp(path, "/healthz", path_len > 8 ? 8 : path_len) == 0) {
-		if (strncmp(hostname, "10.", hostname_len > 3 ? 3 : hostname_len) == 0 &&
-		    strncmp(src_ip_z, "10.", 3) == 0) {
-			// Okay
-			if (inet_aton(src_ip_z, &host) != 0 && ((ntohl(host.s_addr) & 0x000000FF) == 0x00000010)) {
-				fail = 0;
-				goto fail;
-			}
-		}
 	}
 
 	/* Generate parsed_uri */
@@ -338,6 +342,9 @@ fail:
 	free(uniqueid_z);
 	free(src_ip_z);
 	free(dst_ip_z);
+	if (hostname_allocated) {
+		free(hostname);
+	}
 	msc_transaction_cleanup(transaction);
 
 	if (fail) {
