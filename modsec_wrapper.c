@@ -229,7 +229,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 			errno = EINVAL;
 			goto fail;
 		}
-		if (name_len == 4 && strncmp(name, "Host", 4) == 0) {
+		if (name_len == 4 && (strncmp(name, "Host", 4) == 0 || strncmp(name, "host", 4))) {
 			hostname = value;
 			hostname_len = value_len;
 		}
