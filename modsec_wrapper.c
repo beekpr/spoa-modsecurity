@@ -250,11 +250,11 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 		if (strncmp(hostname, "10.", hostname_len > 3 ? 3 : hostname_len) == 0 &&
 			strncmp(src_ip_z, "10.", 3) == 0) {
 			// Okay
-			if (inet_aton(src_ip_z, &host) != 0 && ((ntohl(host.s_addr) & 0x000000FF) == 0x00000010)) {
+			//if (inet_aton(src_ip_z, &host) != 0 && ((ntohl(host.s_addr) & 0x000000FF) == 0x00000010)) {
 				printf("Matched modsec rule");
 				fail = 0;
 				goto fail;
-			}
+			//}
 		}
 	}
 
