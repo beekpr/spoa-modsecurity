@@ -47,6 +47,12 @@ int clamp(struct sample *data, int lower, int upper) {
 	return (int)data->data.u.sint;
 }
 
+int compare(const char* str, unsigned int len, const char* cmp, unsigned int cmp_len) {
+	if (len < cmp_len)
+		return -1;
+	return strncmp(str, cmp, cmp_len);
+}
+
 char* terminated(struct sample *data) {
 	if (data->data.type == SMP_T_STR) {
 		char *retval = malloc(sizeof(char) * (data->data.u.str.data + 1));
@@ -246,10 +252,9 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 	// XXX: AWSHACK
 	// NLBs send an excessive amount of healthchecks that don't even have a host header set, flooding our logs
 	// To prevent this, lets skip those requests here
-	if (strncmp(path, "/healthz", path_len > 8 ? 8 : path_len) == 0) {
-		printf("%s\n", src_ip_z);
-		if (strncmp(hostname, "10.", hostname_len > 3 ? 3 : hostname_len) == 0 &&
-			strncmp(src_ip_z, "10.", 3) == 0) {
+	if (compare(path, path_len, "/healthz", 8) == 0) {
+		if (compare(hostname, hostname_len, "10.", 3) == 0 &&
+		    compare(src_ip_z, 9, "::ffff:10", 9) == 0) {
 			// Okay
 			//if (inet_aton(src_ip_z, &host) != 0 && ((ntohl(host.s_addr) & 0x000000FF) == 0x00000010)) {
 				printf("Matched modsec rule\n");
