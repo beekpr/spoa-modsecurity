@@ -256,7 +256,8 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 		if (compare(hostname, hostname_len, "10.", 3) == 0 &&
 		    compare(src_ip_z, 9, "::ffff:10", 9) == 0) {
 			// Okay
-			if (inet_aton(src_ip_z, &host) != 0 && ((ntohl(host.s_addr) & 0x000000FF) == 0x00000010)) {
+			printf("%#010x\n", ntohl(host.s_addr));
+			if (inet_aton(src_ip_z, &host) != 0 && ((ntohl(host.s_addr) & 0x000000FF) == 0x0000000a)) {
 				printf("Matched modsec rule\n");
 				fail = 0;
 				goto fail;
