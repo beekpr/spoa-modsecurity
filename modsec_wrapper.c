@@ -172,7 +172,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 	const char *hostname = NULL;
 	uint64_t hostname_len = 0;
 	int hostname_allocated = 0;
-	//struct in_addr host = {};
+	struct in_addr host = {};
 
 	ModSecurityIntervention intervention = {};
 	intervention.status = 200;
