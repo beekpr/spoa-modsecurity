@@ -258,7 +258,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 		// Hint: src_ip_z is always IPv6. HAProxy internally converts to IPv6 so that you can use consistent helper
 		// functions, but in this case, that means we can just string compare
 		if (compare(hostname, hostname_len, "10.", 3) == 0 &&
-		    compare(src_ip_z, 9, "::ffff:10.", 10) == 0) {
+		    compare(src_ip_z, 10, "::ffff:10.", 10) == 0) {
 			fail = 0;
 			goto fail;
 		}
