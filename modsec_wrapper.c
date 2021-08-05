@@ -259,9 +259,8 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 		// functions, but in this case, that means we can just string compare
 		if (compare(hostname, hostname_len, "10.", 3) == 0 &&
 		    compare(src_ip_z, 9, "::ffff:10.", 10) == 0) {
-				fail = 0;
-				goto fail;
-			}
+			fail = 0;
+			goto fail;
 		}
 	}
 
