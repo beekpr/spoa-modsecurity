@@ -172,7 +172,6 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 	const char *hostname = NULL;
 	uint64_t hostname_len = 0;
 	int hostname_allocated = 0;
-	struct in6_addr host = {};
 
 	ModSecurityIntervention intervention = {};
 	intervention.status = 200;
@@ -250,21 +249,16 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 	}
 
 	// XXX: AWSHACK
-	// NLBs send an excessive amount of healthchecks that don't even have a host header set, flooding our logs
+	// NLBs send an excessive amount of healthchecks that don't even have a host header set correctly, flooding our logs
 	// To prevent this, lets skip those requests here
+	// Requests have:
+	// * /healthz as path
+	// * A 10.0.0.0/8 IP as both source and host header
 	if (compare(path, path_len, "/healthz", 8) == 0) {
 		// Hint: src_ip_z is always IPv6. HAProxy internally converts to IPv6 so that you can use consistent helper
-		// functions
+		// functions, but in this case, that means we can just string compare
 		if (compare(hostname, hostname_len, "10.", 3) == 0 &&
-		    compare(src_ip_z, 9, "::ffff:10", 9) == 0 &&
-		    inet_pton(AF_INET6, src_ip_z, &host) != 0) {
-			// Okay
-			printf("%#010x %#010x %#010x %#010x\n", host.s6_addr32[0], host.s6_addr32[1], host.s6_addr32[2], host.s6_addr32[3]);
-			if (host.s6_addr32[0] == 0 &&
-				host.s6_addr32[1] == 0 &&
-				host.s6_addr32[2] == 0x0000FFFF &&
-				(host.s6_addr32[3] & 0xFF000000) == 0xa0000000) {
-				printf("Matched modsec rule\n");
+		    compare(src_ip_z, 9, "::ffff:10.", 10) == 0) {
 				fail = 0;
 				goto fail;
 			}
