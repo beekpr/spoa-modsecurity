@@ -260,9 +260,9 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 		    inet_pton(AF_INET6, src_ip_z, &host) != 0) {
 			// Okay
 			printf("%#010x %#010x %#010x %#010x\n", host.s6_addr32[0], host.s6_addr32[1], host.s6_addr32[2], host.s6_addr32[3]);
-			if (host.s6_addr32[0] == -1 &&
-				host.s6_addr32[1] == -1 &&
-				host.s6_addr32[2] == -1 &&
+			if (host.s6_addr32[0] == 0 &&
+				host.s6_addr32[1] == 0 &&
+				host.s6_addr32[2] == 0x0000FFFF &&
 				(host.s6_addr32[3] & 0xFF000000) == 0xa0000000) {
 				printf("Matched modsec rule\n");
 				fail = 0;
