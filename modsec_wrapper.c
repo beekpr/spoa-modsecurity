@@ -148,9 +148,11 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 	const char *qs;
 	uint64_t qs_len;
 
+#if 0
 	const char *body;
 	uint64_t body_len;
 	uint64_t body_exposed_len;
+#endif
 
 	uint64_t name_len;
 	uint64_t value_len;
@@ -268,6 +270,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 		goto intervention;
 	}
 
+#if 0
 	/* Decode body length. Note that the following control
 	 * is just set for avoifing a gcc warning.
 	 */
@@ -286,6 +289,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 	if (msc_intervention(transaction, &intervention) > 0) {
 		goto intervention;
 	}
+#endif
 
 	/* Generate parsed_uri */
 	uri_len = snprintf(NULL, 0, "http://%.*s%.*s%.*s", (int)hostname_len, hostname, (int)path_len, path, (int)qs_len, qs);
@@ -317,6 +321,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 		goto intervention;
 	}
 
+#if 0
 	if (msc_process_request_body(transaction) < 1) {
 		errno = EINVAL;
 		goto fail;
@@ -324,6 +329,7 @@ int modsecurity_process(struct worker *worker, struct modsecurity_parameters *pa
 	if (msc_intervention(transaction, &intervention) > 0) {
 		goto intervention;
 	}
+#endif
 
 	/* End processing. */
 
